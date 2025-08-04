@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quote Request</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    /* RESET */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Garamond, serif;
+      font-size: 1rem;
+      line-height: 1.4;
+      margin: 1rem;
+      color: #333;
+      text-align: center;
+    }
+
+    .logo-wrapper {
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-wrapper img {
+      max-width: 200px;
+      width: 40%;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .form-field label {
+      margin-bottom: 0.4rem;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .form-field input[type="date"],
+    .form-field input[type="text"] {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.3rem;
+      width: 100%;
+    }
+
+    fieldset {
+      border: 1px solid #ccc;
+      border-radius: 0.3rem;
+      padding: 1rem;
+      text-align: left;
+    }
+
+    fieldset legend {
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 0 0.5rem;
+    }
+
+    fieldset .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.5rem 1rem;
+      margin-top: 0.5rem;
+    }
+
+    fieldset label {
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    button {
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #45A049;
+    }
+
+    #messaggio {
+      margin-top: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* MEDIA QUERIES */
+    @media (max-width: 480px) {
+      body {
+        margin: 0.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      button {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      form {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-wrapper">
+    <img src="logo.png" alt="Logo aziendale" />
+  </div>
+
+  <h1>Quote Request</h1>
+
+  <form id="formNoleggio">
+    <div class="form-row">
+      <div class="form-field">
+        <label for="pickupDate">Delivery Date:</label>
+        <input type="date" id="pickupDate" name="pickupDate" required />
+      </div>
+      <div class="form-field">
+        <label for="pickupLocation">Location Delivery:</label>
+        <input type="text" id="pickupLocation" name="pickupLocation" required />
+      </div>
+      <div class="form-field">
+        <label for="dropDate">Collection Date:</label>
+        <input type="date" id="dropDate" name="dropDate" required />
+      </div>
+      <div class="form-field">
+        <label for="dropLocation">Location Collection:</label>
+        <input type="text" id="dropLocation" name="dropLocation" required />
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>Car:</legend>
+      <div class="checkbox-grid">
+        <label><input type="checkbox" name="car" value="Ferrari F8 Spider" /> Ferrari F8 Spider</label>
+        <label><input type="checkbox" name="car" value="Lamborghini Urus" /> Lamborghini Urus</label>
+        <label><input type="checkbox" name="car" value="Ferrari Roma Spider" /> Ferrari Roma Spider</label>
+        <label><input type="checkbox" name="car" value="Ferrari Portofino" /> Ferrari Portofino</label>
+        <label><input type="checkbox" name="car" value="Lamborghini Huracan Evo Spider" /> Lamborghini Huracan Evo Spider</label>
+        <label><input type="checkbox" name="car" value="Porsche 992.2 GTS 4 Cabriolet" /> Porsche 992.2 GTS 4 Cabriolet</label>
+        <label><input type="checkbox" name="car" value="Range Rover Sport D350 Autobiography" /> Range Rover Sport D350 Autobiography</label>
+        <label><input type="checkbox" name="car" value="Porsche Cayenne Turbo GT" /> Porsche Cayenne Turbo GT</label>
+        <label><input type="checkbox" name="car" value="BMW M3 Touring" /> BMW M3 Touring</label>
+        <label><input type="checkbox" name="car" value="BMW X7 M60i" /> BMW X7 M60i</label>
+        <label><input type="checkbox" name="car" value="Land Rover Defender 110 HSE X-dynamic" /> Land Rover Defender 110 HSE X-dynamic</label>
+        <label><input type="checkbox" name="car" value="Mercedes G 63 AMG" /> Mercedes G 63 AMG</label>
+        <label><input type="checkbox" name="car" value="Range Rover Sport" /> Range Rover Sport</label>
+        <label><input type="checkbox" name="car" value="Porsche 992.2 GTS 4 Targa Cabriolet" /> Porsche 992.2 GTS 4 Targa Cabriolet</label>
+        <label><input type="checkbox" name="car" value="Bentley Continental GTC" /> Bentley Continental GTC</label>
+        <label><input type="checkbox" name="car" value="Mercedes G 63 AMG Brabus kit" /> Mercedes G 63 AMG Brabus kit</label>
+      </div>
+    </fieldset>
+
+    <button type="submit">Send Request</button>
+    <p id="messaggio"></p>
+  </form>
+
+  <script>
+    document.getElementById("formNoleggio").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const dati = {
+        pickupDate: form.pickupDate.value,
+        dropDate: form.dropDate.value,
+        pickupLocation: form.pickupLocation.value,
+        dropLocation: form.dropLocation.value,
+        car: Array.from(form.car).filter(c => c.checked).map(c => c.value)
+      };
+
+      const url = "https://script.google.com/macros/s/AKfycbxADTr2qglGd565F4Xi6Zs6OPjntCZXPfvbr8Fe_ga_meM22wFD41kiCSBiTKHZbTLoLw/exec";
+
+      try {
+        const risposta = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dati)
+        });
+
+        if (risposta.ok) {
+          document.getElementById("messaggio").textContent = "Dati inviati con successo!";
+          form.reset();
+        } else {
+          document.getElementById("messaggio").textContent = "Errore nell'invio.";
+        }
+      } catch {
+        document.getElementById("messaggio").textContent = "Errore di rete.";
+      }
+    });
+  </script>
+</body>
+</html>

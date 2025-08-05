@@ -16,7 +16,8 @@
     .form-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
     .form-field { display:flex; flex-direction:column; text-align:left; }
     .form-field label { margin-bottom:0.4rem; font-weight:bold; font-size:1rem; }
-    .form-field input[type="date"], .form-field input[type="text"] {
+    .form-field input[type="date"],
+    .form-field input[type="text"] {
       padding:0.6rem; font-size:1rem; border:1px solid #ccc; border-radius:0.3rem; width:100%;
     }
     fieldset { border:1px solid #ccc; border-radius:0.3rem; padding:1rem; text-align:left; }
@@ -35,18 +36,13 @@
   </style>
 </head>
 <body>
-  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
   <div class="logo-wrapper">
     <img src="logo.png" alt="Logo aziendale" />
   </div>
 
   <h1>Quote Request</h1>
 
-  <form id="formNoleggio"
-        method="POST"
-        action="https://script.google.com/macros/s/AKfycbySG59WyKx9ldfamSFaOugR28AkSkZnlSqKwGQyfxHw0avIjFPuzuZ1mA405rBef5Fkyg/exec"
-        target="hidden_iframe">
+  <form id="formNoleggio">
     <div class="form-row">
       <div class="form-field">
         <label for="pickupDate">Delivery Date:</label>
@@ -96,47 +92,52 @@
     const form        = document.getElementById('formNoleggio');
     const messaggioEl = document.getElementById('messaggio');
     const submitBtn   = document.getElementById('submitBtn');
-    const iframe      = document.getElementById('hidden_iframe');
 
-    window.addEventListener('message', event => {
-      if (!event.data || !event.data.status) return;
-      const { status, message } = event.data;
-      messaggioEl.textContent   = message;
-      messaggioEl.className     = status === 'success' ? 'success' : 'error';
-      submitBtn.disabled        = false;
-      submitBtn.textContent     = 'Send Request';
-      if (status === 'success') {
-        form.reset();
-        setTimeout(() => messaggioEl.textContent = '', 3000);
+    // Imposta la data minima per pickupDate
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('pickupDate').min = today;
+    document.getElementById('pickupDate').addEventListener('change', function() {
+      const pickup = new Date(this.value);
+      const dropDateEl = document.getElementById('dropDate');
+      if (this.value) {
+        pickup.setDate(pickup.getDate() + 1);
+        dropDateEl.min = pickup.toISOString().split('T')[0];
       }
     });
 
-    iframe.addEventListener('load', () => {
-      submitBtn.disabled      = false;
-      submitBtn.textContent   = 'Send Request';
-      if (messaggioEl.className === 'loading') {
-        messaggioEl.textContent = 'Nessuna risposta dal server.';
-        messaggioEl.className   = 'error';
-      }
-    });
-
-    form.addEventListener('submit', () => {
-      messaggioEl.textContent  = 'Invio in corso...';
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      messaggioEl.textContent  = 'Invio in corso…';
       messaggioEl.className    = 'loading';
       submitBtn.disabled       = true;
-      submitBtn.textContent    = 'Sending...';
-    });
 
-    document.getElementById('pickupDate').addEventListener('change', function() {
-      const pickupDate = new Date(this.value);
-      const dropDate   = document.getElementById('dropDate');
-      if (this.value) {
-        const minDrop = new Date(pickupDate);
-        minDrop.setDate(minDrop.getDate() + 1);
-        dropDate.min = minDrop.toISOString().split('T')[0];
-      }
+      // Costruisci i dati del form
+      const data = {
+        pickupDate:     form.pickupDate.value,
+        dropDate:       form.dropDate.value,
+        pickupLocation: form.pickupLocation.value,
+        dropLocation:   form.dropLocation.value,
+        car: Array.from(form.car)
+                  .filter(chk => chk.checked)
+                  .map(chk => chk.value)
+      };
+
+      // Invio a Apps Script
+      google.script.run
+        .withSuccessHandler(() => {
+          messaggioEl.textContent = 'Dati inviati con successo!';
+          messaggioEl.className   = 'success';
+          form.reset();
+          submitBtn.disabled = false;
+          setTimeout(() => messaggioEl.textContent = '', 3000);
+        })
+        .withFailureHandler(err => {
+          messaggioEl.textContent = 'Errore: ' + err.message;
+          messaggioEl.className   = 'error';
+          submitBtn.disabled      = false;
+        })
+        .processForm(data);
     });
-    document.getElementById('pickupDate').min = new Date().toISOString().split('T')[0];
   </script>
 </body>
 </html>

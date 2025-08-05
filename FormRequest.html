@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,6 @@
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: Garamond, serif;
       font-size: 1rem;
@@ -20,22 +20,9 @@
       color: #333;
       text-align: center;
     }
-
-    .logo-wrapper {
-      margin-bottom: 1.5rem;
-    }
-
-    .logo-wrapper img {
-      max-width: 200px;
-      width: 40%;
-      height: auto;
-    }
-
-    h1 {
-      font-size: 1.75rem;
-      margin-bottom: 1.5rem;
-    }
-
+    .logo-wrapper { margin-bottom: 1.5rem; }
+    .logo-wrapper img { max-width: 200px; width: 40%; height: auto; }
+    h1 { font-size: 1.75rem; margin-bottom: 1.5rem; }
     form {
       max-width: 600px;
       margin: 0 auto;
@@ -44,25 +31,17 @@
       flex-direction: column;
       gap: 1.5rem;
     }
-
     .form-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
     }
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      text-align: left;
-    }
-
+    .form-field { display: flex; flex-direction: column; text-align: left; }
     .form-field label {
       margin-bottom: 0.4rem;
       font-weight: bold;
       font-size: 1rem;
     }
-
     .form-field input[type="date"],
     .form-field input[type="text"] {
       padding: 0.6rem;
@@ -71,27 +50,23 @@
       border-radius: 0.3rem;
       width: 100%;
     }
-
     fieldset {
       border: 1px solid #ccc;
       border-radius: 0.3rem;
       padding: 1rem;
       text-align: left;
     }
-
     fieldset legend {
       font-weight: bold;
       font-size: 1.1rem;
       padding: 0 0.5rem;
     }
-
-    fieldset .checkbox-grid {
+    .checkbox-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 0.5rem 1rem;
       margin-top: 0.5rem;
     }
-
     fieldset label {
       cursor: pointer;
       font-size: 0.95rem;
@@ -99,7 +74,6 @@
       align-items: center;
       gap: 0.4rem;
     }
-
     button {
       padding: 0.8rem 1.2rem;
       font-size: 1rem;
@@ -111,16 +85,11 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
-
-    button:hover {
-      background-color: #45A049;
-    }
-
+    button:hover { background-color: #45A049; }
     button:disabled {
       background-color: #cccccc;
       cursor: not-allowed;
     }
-
     #messaggio {
       margin-top: 1rem;
       font-size: 1rem;
@@ -128,47 +97,33 @@
       color: #333;
       min-height: 1.5rem;
     }
-
-    .loading {
-      color: #666 !important;
-    }
-
-    .success {
-      color: #4CAF50 !important;
-    }
-
-    .error {
-      color: #f44336 !important;
-    }
-
-    /* MEDIA QUERIES */
+    .loading { color: #666 !important; }
+    .success { color: #4CAF50 !important; }
+    .error   { color: #f44336 !important; }
     @media (max-width: 480px) {
-      body {
-        margin: 0.5rem;
-      }
-      h1 {
-        font-size: 1.5rem;
-      }
-      button {
-        font-size: 0.9rem;
-      }
+      body { margin: 0.5rem; }
+      h1   { font-size: 1.5rem; }
+      button { font-size: 0.9rem; }
     }
-
     @media (min-width: 1024px) {
-      form {
-        padding: 0;
-      }
+      form { padding: 0; }
     }
   </style>
 </head>
 <body>
+  <!-- iframe nascosto per intercettare la risposta -->
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
+
   <div class="logo-wrapper">
     <img src="logo.png" alt="Logo aziendale" />
   </div>
 
   <h1>Quote Request</h1>
 
-  <form id="formNoleggio" method="POST" action="https://script.google.com/macros/s/AKfycbwNyPgqXr5izat8md0YIPWNRNMfDI-jPqOZ_ZaI4o4JD5n8c7CUa1e1hXenpfXw7bnh/exec">
+  <form id="formNoleggio"
+        method="POST"
+        action="https://script.google.com/macros/s/AKfycbyzC0PBY6jAiQLak5KcooLLfXHKr996-p3_YzJVa6c8A-rxqDrS6yoKJCUHLK7mBVXpKw/exec"
+        target="hidden_iframe">
     <div class="form-row">
       <div class="form-field">
         <label for="pickupDate">Delivery Date:</label>
@@ -215,29 +170,45 @@
   </form>
 
   <script>
-    // Disabilita il comportamento JavaScript di fetch, utilizza il submit HTML nativo
-    const form = document.getElementById('formNoleggio');
-    const messaggioEl = document.getElementById('messaggio');
-    const submitBtn = document.getElementById('submitBtn');
+    const form       = document.getElementById('formNoleggio');
+    const messaggioEl= document.getElementById('messaggio');
+    const submitBtn  = document.getElementById('submitBtn');
 
-    form.addEventListener('submit', function(e) {
+    // Listener per postMessage dalla Apps Script
+    window.addEventListener('message', event => {
+      const { status, message } = event.data || {};
+      if (status === 'success') {
+        messaggioEl.textContent = message;
+        messaggioEl.className   = 'success';
+        form.reset();
+        setTimeout(() => messaggioEl.textContent = '', 3000);
+      } else if (status === 'error') {
+        messaggioEl.textContent = message;
+        messaggioEl.className   = 'error';
+      }
+      submitBtn.disabled   = false;
+      submitBtn.textContent= 'Send Request';
+    });
+
+    // Submit handler per mostrare loading
+    form.addEventListener('submit', function() {
       messaggioEl.textContent = 'Invio in corso...';
-      messaggioEl.className = 'loading';
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending...';
+      messaggioEl.className   = 'loading';
+      submitBtn.disabled      = true;
+      submitBtn.textContent   = 'Sending...';
     });
 
     // Validazione date
-    document.getElementById("pickupDate").addEventListener("change", function() {
+    document.getElementById('pickupDate').addEventListener('change', function() {
       const pickupDate = new Date(this.value);
-      const dropDateInput = document.getElementById("dropDate");
+      const dropDate   = document.getElementById('dropDate');
       if (this.value) {
         const minDrop = new Date(pickupDate);
         minDrop.setDate(minDrop.getDate() + 1);
-        dropDateInput.min = minDrop.toISOString().split('T')[0];
+        dropDate.min = minDrop.toISOString().split('T')[0];
       }
     });
-    document.getElementById("pickupDate").min = new Date().toISOString().split('T')[0];
+    document.getElementById('pickupDate').min = new Date().toISOString().split('T')[0];
   </script>
 </body>
 </html>

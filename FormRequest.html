@@ -116,11 +116,29 @@
       background-color: #45A049;
     }
 
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
     #messaggio {
       margin-top: 1rem;
       font-size: 1rem;
       font-weight: bold;
       color: #333;
+      min-height: 1.5rem;
+    }
+
+    .loading {
+      color: #666 !important;
+    }
+
+    .success {
+      color: #4CAF50 !important;
+    }
+
+    .error {
+      color: #f44336 !important;
     }
 
     /* MEDIA QUERIES */
@@ -192,14 +210,26 @@
       </div>
     </fieldset>
 
-    <button type="submit">Send Request</button>
+    <button type="submit" id="submitBtn">Send Request</button>
     <p id="messaggio"></p>
   </form>
 
   <script>
     document.getElementById("formNoleggio").addEventListener("submit", async function (e) {
       e.preventDefault();
+      
+      // Elementi DOM
+      const messaggioEl = document.getElementById("messaggio");
+      const submitBtn = document.getElementById("submitBtn");
       const form = e.target;
+      
+      // Mostra messaggio di caricamento e disabilita il pulsante
+      messaggioEl.textContent = "Invio in corso...";
+      messaggioEl.className = "loading";
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+      
+      // Raccolta dati dal form
       const dati = {
         pickupDate: form.pickupDate.value,
         dropDate: form.dropDate.value,
@@ -208,24 +238,81 @@
         car: Array.from(form.car).filter(c => c.checked).map(c => c.value)
       };
 
-      const url = "https://script.google.com/macros/s/AKfycbzc116Xz8Inx81NavNrMByQNoWyl8x5aBdDI3tNlKODNEY-pcah3FO-DDDrCYvGqNB0Lg/exec";
+      // IMPORTANTE: Sostituisci questo URL con il NUOVO URL del tuo deployment Google Apps Script
+      const url = "https://script.google.com/macros/s/AKfycbyzC0PBY6jAiQLak5KcooLLfXHKr996-p3_YzJVa6c8A-rxqDrS6yoKJCUHLK7mBVXpKw/exec";
+
       try {
-        const risposta = await fetch(url, {
+        // Log per debug (puoi rimuoverlo in produzione)
+        console.log("Invio dati:", dati);
+        
+        const response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dati)
+          headers: { 
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(dati),
+          mode: 'cors'
         });
 
-        if (risposta.ok) {
-          document.getElementById("messaggio").textContent = "Dati inviati con successo!";
-          form.reset();
-        } else {
-          document.getElementById("messaggio").textContent = "Errore nell'invio.";
+        console.log("Status risposta:", response.status);
+
+        if (!response.ok) {
+          throw new Error(`Errore HTTP! Status: ${response.status}`);
         }
-      } catch {
-        document.getElementById("messaggio").textContent = "Errore di rete.";
+
+        const result = await response.json();
+        console.log("Risultato:", result);
+        
+        if (result.result === 'success') {
+          messaggioEl.textContent = "Dati inviati con successo!";
+          messaggioEl.className = "success";
+          form.reset();
+          
+          // Mostra messaggio di successo per 3 secondi
+          setTimeout(() => {
+            messaggioEl.textContent = "";
+            messaggioEl.className = "";
+          }, 3000);
+          
+        } else {
+          messaggioEl.textContent = "Errore nell'invio: " + (result.error || "Errore sconosciuto");
+          messaggioEl.className = "error";
+        }
+        
+      } catch (error) {
+        console.error("Errore dettagliato:", error);
+        messaggioEl.textContent = "Errore di rete: " + error.message;
+        messaggioEl.className = "error";
+        
+        // In caso di errore di rete, suggerisci di controllare la connessione
+        setTimeout(() => {
+          if (messaggioEl.className === "error") {
+            messaggioEl.textContent += " - Verifica la connessione internet e riprova.";
+          }
+        }, 2000);
+        
+      } finally {
+        // Riabilita il pulsante e ripristina il testo
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send Request";
       }
     });
+
+    // Funzione per validare le date (opzionale)
+    document.getElementById("pickupDate").addEventListener("change", function() {
+      const pickupDate = new Date(this.value);
+      const dropDateInput = document.getElementById("dropDate");
+      
+      // Imposta la data minima per il drop come il giorno dopo il pickup
+      if (this.value) {
+        const minDropDate = new Date(pickupDate);
+        minDropDate.setDate(minDropDate.getDate() + 1);
+        dropDateInput.min = minDropDate.toISOString().split('T')[0];
+      }
+    });
+
+    // Imposta la data minima per pickup come oggi
+    document.getElementById("pickupDate").min = new Date().toISOString().split('T')[0];
   </script>
 </body>
 </html>

@@ -208,8 +208,7 @@
         car: Array.from(form.car).filter(c => c.checked).map(c => c.value)
       };
 
-      const url = "https://script.google.com/macros/s/AKfycbxADTr2qglGd565F4Xi6Zs6OPjntCZXPfvbr8Fe_ga_meM22wFD41kiCSBiTKHZbTLoLw/exec";
-
+      const url = "https://script.google.com/macros/s/AKfycbzc116Xz8Inx81NavNrMByQNoWyl8x5aBdDI3tNlKODNEY-pcah3FO-DDDrCYvGqNB0Lg/exec";
       try {
         const risposta = await fetch(url, {
           method: "POST",
